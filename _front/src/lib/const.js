@@ -1,0 +1,1 @@
+export const back_api = `${import.meta.env.VITE_SERVER_URL}/api/v3`

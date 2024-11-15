@@ -1,0 +1,8 @@
+.env
+node_modules
+subuploads
+uploads
+*.log
+coverage
+down.txt
+sitemap.xml
