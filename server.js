@@ -4,16 +4,20 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 const app = express();
 import { sql_con } from './back-lib/db.js'
+import cookieParser from "cookie-parser"
 
 dotenv.config();
 
 import { handler } from "./_front/build/handler.js"
 
+import { minisite1Router } from './routes/admin_minisite1.js'
+import { adminBaseRouter } from "./routes/admin_base.js"
 import { apiRouter } from "./routes/api.js"
 import { authRouter } from "./routes/auth.js"
 
 
 // import { apiRouter } from "./routes/exapi.js"
+app.use(cookieParser());
 app.set('port', process.env.PORT || 3075);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -37,9 +41,8 @@ if (process.env.NODE_ENV === 'production') {
     const whiteListStr = process.env.SITE_LINK
     console.log(whiteListStr);
     const whiteListArr = whiteListStr.split(',');
-    originLink = [/\.allthatby\.co.kr$/, 'https://allthatby.co.kr']
 } else {
-    originLink = true;
+    originLink = "http://localhost:5173";
 }
 
 let corsOptions = {
@@ -53,7 +56,8 @@ app.enable('trust proxy');
 
 app.use('/api/v3', apiRouter);
 app.use('/api/v3/auth', authRouter);
-
+app.use('/api/v3/adminbase', adminBaseRouter);
+app.use('/api/v3/minisite1', minisite1Router);
 
 app.use('/chk', (req, res) => {
     res.send('백엔드 생성 완료!!')

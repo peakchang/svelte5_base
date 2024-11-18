@@ -11,3 +11,5 @@ export const dataURItoBlob = (dataURI) => {
     for (let i = 0; i < max; i++) ia[i] = bytes.charCodeAt(i);
     return new Blob([ia], { type: mime });
 };
+
+

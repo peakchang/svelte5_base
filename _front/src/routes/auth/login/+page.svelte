@@ -2,22 +2,40 @@
     import axios from "axios";
     import { back_api } from "$lib/const.js";
     import { goto } from "$app/navigation";
+    import { user_info } from "$lib/store.js";
 
     let userId = $state("");
     let userPwd = $state("");
 
-    async function loginSubmit() {
-        console.log("로그인 고?");
+    console.log(back_api);
 
+    $effect(() => {
+        if ($user_info.id) {
+            alert("이미 로그인 되어 있습니다.");
+            goto("/");
+        }
+    });
+
+    async function loginSubmit() {
+        if (!userId ||!userPwd) {
+            alert("아이디와 비밀번호를 모두 입력하세요.");
+            return;
+        }
         try {
-            const res = await axios.post(`${back_api}/auth/login`, {
-                userid: userId,
-                password: userPwd,
-            });
-            console.log(res);
+            const res = await axios.post(
+                `${back_api}/auth/login`,
+                {
+                    userid: userId,
+                    password: userPwd,
+                },
+                { withCredentials: true },
+            );
+            if (res.status === 200) {
+                goto('/')
+            }
         } catch (err) {
             console.log(err.message);
-            
+
             console.error(err.message);
         }
     }

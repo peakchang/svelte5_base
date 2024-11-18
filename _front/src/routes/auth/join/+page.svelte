@@ -2,6 +2,8 @@
     import axios from "axios";
     import { back_api } from "$lib/const.js";
     import { goto } from "$app/navigation";
+    import { user_info } from "$lib/store.js";
+
     let userId = $state("");
     let userIdAlertBool = $state(true);
 
@@ -13,6 +15,13 @@
     let userPwdChk = $state("");
 
     let pwdChkBool = $state(false);
+
+    $effect(() => {
+        if($user_info.id){
+            alert('이미 회원입니다.')
+            goto('/')
+        }
+    });
 
     // 아이디 입력 란 포커스 아웃시 중복 아이디 체크
     async function idFocusOut() {

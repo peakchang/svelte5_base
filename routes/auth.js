@@ -37,6 +37,13 @@ function authenticateToken(req, res, next) {
 
 const authRouter = express.Router();
 
+authRouter.get("/token", async (req, res) => {
+    const cookies = req.cookies
+    console.log(cookies);
+
+    res.json({ status: true })
+})
+
 // 회원가입 엔드포인트
 authRouter.post("/register", async (req, res) => {
 
@@ -98,16 +105,15 @@ authRouter.post("/login", async (req, res) => {
             if (pwdChkBool) {
 
                 // 액세스 토큰과 리프레쉬 토큰 발행
-                const accessToken = jwt.sign({ id: userInfo.id }, SECRET_KEY, { expiresIn: "15m" });
-                const refreshToken = jwt.sign({ id: userInfo.id }, SECRET_KEY, { expiresIn: "7d" });
+                const token = jwt.sign({ id: userInfo.id }, SECRET_KEY, { expiresIn: "7d" });
 
                 const updateQuery = "UPDATE users SET refresh_token = ? WHERE id = ?";
-                await sql_con.promise().query(updateQuery, [refreshToken, userInfo.id]);
+                await sql_con.promise().query(updateQuery, [token, userInfo.id]);
+                console.log(token);
 
-                console.log(accessToken);
-
-                res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
-                return res.json({ accessToken });
+                // res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+                res.cookie("tk", token, { httpOnly: true, secure: false, sameSite: 'lax' });
+                return res.json({});
 
             } else {
                 return res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
@@ -120,20 +126,7 @@ authRouter.post("/login", async (req, res) => {
     } catch (err) {
         console.error(err.message);
     }
-
-    // const user = users.find((u) => u.username === username);
-    // if (!user) {
-    //     return res.status(401).json({ message: "Invalid credentials" });
-    // }
-
-    // const isPasswordValid = await bcrypt.compare(password, user.password);
-    // if (!isPasswordValid) {
-    //     return res.status(401).json({ message: "Invalid credentials" });
-    // }
-
-    // // JWT 발급
-    // const token = generateToken(user);
-    res.json({});
+    return res.json({});
 });
 
 authRouter.post('/id_duplicate_chk', async (req, res) => {
